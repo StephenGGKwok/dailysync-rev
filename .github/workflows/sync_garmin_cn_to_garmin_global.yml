@@ -16,11 +16,8 @@ on:
           - sync_all_global_to_cn
           - sync_wellness_global_to_cn
   schedule:
-    #  每30分钟检查一次
-    - cron: "*/30 * * * *"
-  push:
-    branches:
-      - main
+    #  每6小时检查一次
+    - cron: "0 */6 * * *"
 
 env:
   # please change to your own config.
