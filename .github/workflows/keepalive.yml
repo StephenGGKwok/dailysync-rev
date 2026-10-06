@@ -1,0 +1,23 @@
+name: Keep Repo Active
+
+# 每50天跑一次空commit，防止GitHub因仓库无活动而暂停scheduled workflows
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Keep repo active
+        run: |
+          date > .keepalive
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .keepalive
+          git commit -m "chore: keep repo active" || true
+          git push
