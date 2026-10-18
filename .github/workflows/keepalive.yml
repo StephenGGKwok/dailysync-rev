@@ -1,23 +1,30 @@
 name: Keep Repo Active
 
-# 每50天跑一次空commit，防止GitHub因仓库无活动而暂停scheduled workflows
+# 每周一次空提交，防止 GitHub 因仓库 60 天无活动而自动停掉 scheduled workflows。
+#
+# 历史：原版每月 1 号 00:00 UTC 触发。2026-06/07/08/09/10 五次运行全部为 cancelled，
+#       且都是在创建后整整 24 小时才被回收 —— 未拿到 runner，属排队超时。
+#       每月只跑一次，一旦被丢就是 30 天空窗，离 60 天的停机线太近。
+# 现改为：每周一次、避开整点、加 10 分钟超时兜底。单次失败下周还能补。
 on:
   schedule:
-    - cron: '0 0 1 * *'
+    - cron: '23 3 * * 1'
   workflow_dispatch:
 
 jobs:
   keepalive:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Keep repo active
         run: |
-          date > .keepalive
+          date -u > .keepalive
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .keepalive
-          git commit -m "chore: keep repo active" || true
+          git commit -m "chore: keep repo active"
+          git pull --rebase origin main
           git push
