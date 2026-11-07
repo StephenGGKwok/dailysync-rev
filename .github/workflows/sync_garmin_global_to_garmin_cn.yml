@@ -16,8 +16,8 @@ on:
           - sync_all_cn_to_global
           - sync_wellness_cn_to_global
   schedule:
-    #  每6小时检查一次
-    - cron: "13 */6 * * *"
+    #  每4小时检查一次（2026-11-08 实验：验证 GitHub 能否交付 4h 间隔）
+    - cron: "13 */4 * * *"
 
 env:
   # please change to your own config.
